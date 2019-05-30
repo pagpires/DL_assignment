@@ -1,3 +1,3 @@
-### Repo for personal implementation of DL courses' assignments
-cs231n - 2016
+### Repo of personal solutions for DL courses' assignments
+cs231n - 2016  
 cs224n - 2019 Spring
