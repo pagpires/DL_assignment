@@ -327,7 +327,7 @@ class NMT(nn.Module):
 
         # Set e_t to -inf where enc_masks has 1
         if enc_masks is not None:
-            e_t.data.masked_fill_(enc_masks.byte(), -float('inf'))
+            e_t.data.masked_fill_(enc_masks.to(torch.bool), -float('inf'))
 
         ### YOUR CODE HERE (~6 Lines)
         ### TODO:

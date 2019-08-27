@@ -36,6 +36,7 @@ Options:
     --lr=<float>                            learning rate [default: 0.001]
     --uniform-init=<float>                  uniformly initialize all parameters [default: 0.1]
     --save-to=<file>                        model save path [default: model.bin]
+    --save-benchmark-to=<file>              model benchmark save path [default: model_benchmark.bin]
     --valid-niter=<int>                     perform validation after how many iterations [default: 2000]
     --dropout=<float>                       dropout [default: 0.3]
     --max-decoding-time-step=<int>          maximum number of decoding time steps [default: 70]
@@ -120,6 +121,7 @@ def train(args: Dict):
     valid_niter = int(args['--valid-niter'])
     log_every = int(args['--log-every'])
     model_save_path = args['--save-to']
+    model_benchmark_path = args['--save-benchmark-to']
 
     vocab = Vocab.load(args['--vocab'])
 
@@ -151,6 +153,9 @@ def train(args: Dict):
     hist_valid_scores = []
     train_time = begin_time = time.time()
     print('begin Maximum Likelihood training')
+    print('save benchmark to {}'.format(model_benchmark_path))
+    model.save(model_benchmark_path)
+    print('benchmark saved')
 
     while True:
         epoch += 1
@@ -322,7 +327,7 @@ def main():
     args = docopt(__doc__)
 
     # Check pytorch version
-    assert(torch.__version__[:3] == "1.0"), "Please update your installation of PyTorch. You have {} and you should have version 1.0.0".format(torch.__version__)
+    assert(torch.__version__[0] == "1"), "Please update your installation of PyTorch. You have {} and you should have version 1.0.0".format(torch.__version__)
 
     # seed the random number generators
     seed = int(args['--seed'])
