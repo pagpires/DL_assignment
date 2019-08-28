@@ -131,6 +131,11 @@ def train(args: Dict):
                 vocab=vocab)
     model.train()
 
+    # keep model.to() on top before others, potentially avoid weights corruption after model.save()
+    device = torch.device("cuda:0" if args['--cuda'] else "cpu")
+    print('use device: %s' % device, file=sys.stderr)
+    model = model.to(device)
+
     uniform_init = float(args['--uniform-init'])
     if np.abs(uniform_init) > 0.:
         print('uniformly initialize parameters [-%f, +%f]' % (uniform_init, uniform_init), file=sys.stderr)
@@ -139,11 +144,6 @@ def train(args: Dict):
 
     vocab_mask = torch.ones(len(vocab.tgt))
     vocab_mask[vocab.tgt['<pad>']] = 0
-
-    device = torch.device("cuda:0" if args['--cuda'] else "cpu")
-    print('use device: %s' % device, file=sys.stderr)
-
-    model = model.to(device)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=float(args['--lr']))
 
@@ -224,10 +224,7 @@ def train(args: Dict):
                 if is_better:
                     patience = 0
                     print('save currently the best model to [%s]' % model_save_path, file=sys.stderr)
-                    # TODO should switch to CPU and save otherwise wrong weights
-                    model.to(torch.device("cpu")).save(model_save_path)
-                    # switch back to original device
-                    model.to(device)
+                    model.save(model_save_path)
 
                     # also save the optimizers' state
                     torch.save(optimizer.state_dict(), model_save_path + '.optim')
