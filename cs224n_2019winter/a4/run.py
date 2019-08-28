@@ -37,7 +37,7 @@ Options:
     --uniform-init=<float>                  uniformly initialize all parameters [default: 0.1]
     --save-to=<file>                        model save path [default: model.bin]
     --save-benchmark-to=<file>              model benchmark save path [default: model_benchmark.bin]
-    --valid-niter=<int>                     perform validation after how many iterations [default: 2000]
+    --valid-niter=<int>                     perform validation after how many iterations [default: 200]
     --dropout=<float>                       dropout [default: 0.3]
     --max-decoding-time-step=<int>          maximum number of decoding time steps [default: 70]
 """
@@ -224,7 +224,10 @@ def train(args: Dict):
                 if is_better:
                     patience = 0
                     print('save currently the best model to [%s]' % model_save_path, file=sys.stderr)
-                    model.save(model_save_path)
+                    # TODO should switch to CPU and save otherwise wrong weights
+                    model.to(torch.device("cpu")).save(model_save_path)
+                    # switch back to original device
+                    model.to(device)
 
                     # also save the optimizers' state
                     torch.save(optimizer.state_dict(), model_save_path + '.optim')
